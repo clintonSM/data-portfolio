@@ -31,6 +31,77 @@ public class EnviosServiceImpl implements EnviosService {
 
     @Override
     public Mono<Void> envios(Update request) {
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = crearMenuOpciones();
+        SendMessage message = new SendMessage();
+        message.setChatId(request.getMessage().getChat().getId().toString());
+        message.setText("Hola " + request.getMessage().getFrom().getFirstName() + " ¿Qué desea revisar hoy?");
+        message.setReplyMarkup(inlineKeyboardMarkup);
+
+        return sendTelegrama.sendMessage(message);
+
+    }
+
+    @Override
+    public Mono<Void> handleCallback(Update update) {
+        if (update.hasCallbackQuery()) {
+            String callbackData = update.getCallbackQuery().getData();
+            String chatId = update.getCallbackQuery().getMessage().getChatId().toString();
+            InlineKeyboardMarkup markup = finalizarDiag();
+            SendMessage message = new SendMessage();
+            String responseMessage;
+
+            switch (callbackData) {
+                case "clima":
+                    responseMessage = "Aquí tienes la información del clima: ☀️ 25°C" + "\n\n¿Desea revisar algo mas?";                  
+                    message.setChatId(chatId);
+                    message.setText(responseMessage);
+                    message.setReplyMarkup(markup);
+                    return sendTelegrama.sendMessage(message);
+
+                case "trafico":
+                    responseMessage = "El tráfico está ligero en tu zona 🚗" + "\n\n¿Desea revisar algo mas?";
+                    message.setChatId(chatId);
+                    message.setText(responseMessage);
+                    message.setReplyMarkup(markup);
+                    return sendTelegrama.sendMessage(message);
+
+                case "eventos":
+                    responseMessage = "Eventos locales próximos: Concierto el sábado 🎶"
+                            + "\n\n¿Desea revisar algo mas?";
+                    message.setChatId(chatId);
+                    message.setText(responseMessage);
+                    message.setReplyMarkup(markup);
+                    return sendTelegrama.sendMessage(message);
+                case "recordatorios":
+                    responseMessage = "No tienes recordatorios pendientes 📅" + "\n\n¿Desea revisar algo mas?";
+                    message.setChatId(chatId);
+                    message.setText(responseMessage);
+                    message.setReplyMarkup(markup);
+                    return sendTelegrama.sendMessage(message);
+                case "finalizar":
+                    responseMessage = "Gracias por usar el servicio. ¡Hasta pronto!";
+                    message.setChatId(chatId);
+                    message.setText(responseMessage);
+                    return sendTelegrama.sendMessage(message);
+                case "continuar":
+                    responseMessage = "¿Qué deseas revisar ahora?";
+                    InlineKeyboardMarkup markupCont = crearMenuOpciones();
+                    message.setChatId(chatId);
+                    message.setText(responseMessage);
+                    message.setReplyMarkup(markupCont);
+                    return sendTelegrama.sendMessage(message);
+                default:
+                    responseMessage = "Opción no válida.";
+                    message.setChatId(chatId);
+                    message.setText(responseMessage);
+                    return sendTelegrama.sendMessage(message);
+            }
+        }
+        return Mono.empty();
+    }
+
+    private InlineKeyboardMarkup crearMenuOpciones() {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> row = new ArrayList<>();
@@ -48,61 +119,14 @@ public class EnviosServiceImpl implements EnviosService {
         InlineKeyboardButton buttonD = new InlineKeyboardButton("D. Recordatorios");
         buttonD.setCallbackData("recordatorios");
 
-        // Añadir los botones a la fila
         row.add(buttonA);
         row.add(buttonB);
         row.add(buttonC);
         row.add(buttonD);
-
-        // Añadir la fila a la lista de filas
         rowsInline.add(row);
 
-        // Establecer el teclado
         inlineKeyboardMarkup.setKeyboard(rowsInline);
-
-        SendMessage message = new SendMessage();
-        message.setChatId(request.getMessage().getChat().getId().toString());
-        message.setText("Hola " + request.getMessage().getFrom().getFirstName() + " ¿Qué desea revisar hoy?");
-        message.setReplyMarkup(inlineKeyboardMarkup);
-
-        return sendTelegrama.sendMessage(message);
-
-    }
-
-    @Override
-    public Mono<Void> handleCallback(Update update) {
-        if (update.hasCallbackQuery()) {
-            String callbackData = update.getCallbackQuery().getData();
-            String chatId = update.getCallbackQuery().getMessage().getChatId().toString();
-
-            String responseMessage;
-
-            switch (callbackData) {
-                case "clima":
-                    responseMessage = "Aquí tienes la información del clima: ☀️ 25°C";
-                    break;
-                case "trafico":
-                    responseMessage = "El tráfico está ligero en tu zona 🚗";
-                    break;
-                case "eventos":
-                    responseMessage = "Eventos locales próximos: Concierto el sábado 🎶";
-                    break;
-                case "recordatorios":
-                    responseMessage = "No tienes recordatorios pendientes 📅";
-                    break;
-                default:
-                    responseMessage = "Opción no válida.";
-            }
-
-            InlineKeyboardMarkup markup = finalizarDiag();
-
-            SendMessage message = new SendMessage();
-            message.setChatId(chatId);
-            message.setText(responseMessage + "\n\n¿Desea revisar algo mas?");
-            message.setReplyMarkup(markup);
-            return sendTelegrama.sendMessage(message);
-        }
-        return Mono.empty();
+        return inlineKeyboardMarkup;
     }
 
     private InlineKeyboardMarkup finalizarDiag() {
