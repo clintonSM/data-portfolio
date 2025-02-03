@@ -93,11 +93,34 @@ public class EnviosServiceImpl implements EnviosService {
                 default:
                     responseMessage = "Opción no válida.";
             }
+
+            InlineKeyboardMarkup markup = finalizarDiag();
+
             SendMessage message = new SendMessage();
             message.setChatId(chatId);
-            message.setText(responseMessage);
+            message.setText(responseMessage + "\n\n¿Desea revisar algo mas?");
+            message.setReplyMarkup(markup);
             return sendTelegrama.sendMessage(message);
         }
         return Mono.empty();
     }
+
+    private InlineKeyboardMarkup finalizarDiag() {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> row = new ArrayList<>();
+
+        InlineKeyboardButton continueButton = new InlineKeyboardButton("Nueva consulta");
+        continueButton.setCallbackData("continuar");
+
+        InlineKeyboardButton endButton = new InlineKeyboardButton("Finalizar");
+        endButton.setCallbackData("finalizar");
+
+        row.add(continueButton);
+        row.add(endButton);
+        rowsInline.add(row);
+        markup.setKeyboard(rowsInline);
+        return markup;
+    }
+
 }
