@@ -1,11 +1,11 @@
 package com.ctsml.notificaciones.business;
 
-import com.ctsml.notificaciones.model.MessageResponse;
-import com.ctsml.notificaciones.model.NotificationRequest;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import reactor.core.publisher.Mono;
 
 public interface EnviosService {
     
-    Mono<MessageResponse> envios(NotificationRequest request);
+    Mono<Void> envios(Update request);
+    Mono<Void> handleCallback(Update request);
 }

@@ -2,10 +2,9 @@ package com.ctsml.notificaciones.expose;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import com.ctsml.notificaciones.business.EnviosService;
-import com.ctsml.notificaciones.model.MessageResponse;
-import com.ctsml.notificaciones.model.NotificationRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -24,10 +23,17 @@ public class NotificacionesController {
     EnviosService enviosService;
 
     @PostMapping("/send")
-    public Mono<MessageResponse> postMethodName(@RequestBody NotificationRequest request) {
+    public Mono<Void> postMethodName(@RequestBody Update request) {
         
-        log.info("INICIO");
+        log.info("INICIO SEND");
         return enviosService.envios(request);
+    }
+
+    @PostMapping("/callback")
+    public Mono<Void> postCallback(@RequestBody Update request) {
+        
+        log.info("INICIO CALLBACK");
+        return enviosService.handleCallback(request);
     }
     
     
