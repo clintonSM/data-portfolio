@@ -23,18 +23,15 @@ public class NotificacionesController {
     EnviosService enviosService;
 
     @PostMapping("/send")
-    public Mono<Void> postMethodName(@RequestBody Update request) {
+    public Mono<Void> postMethodName(@RequestBody Update update) {
         
         log.info("INICIO SEND");
-        return enviosService.envios(request);
+        if (update.hasCallbackQuery()) {
+            return enviosService.handleCallback(update);
+        } else {
+            return enviosService.envios(update);
+        }
     }
-
-    @PostMapping("/callback")
-    public Mono<Void> postCallback(@RequestBody Update request) {
-        
-        log.info("INICIO CALLBACK");
-        return enviosService.handleCallback(request);
-    }
-    
+ 
     
 }
