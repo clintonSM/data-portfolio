@@ -48,8 +48,10 @@ public class NotificacionesController {
         // Verifica si el update contiene una consulta de callback (interacción con
         // botón inline)
         if (update.hasCallbackQuery()) {
+            log.info(update.toString());
             return callbackService.handleCallback(update);
         } else {
+            log.info(update.toString());
             return messageService.envios(update);
         }
     }
