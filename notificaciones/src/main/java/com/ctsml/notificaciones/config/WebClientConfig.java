@@ -21,12 +21,23 @@ public class WebClientConfig {
     private String botToken;
 
     @Value("${telegram.chat.url}")
-    private String url;
+    private String urlTelegram;
+
+    @Value("${weather.clima.url}")
+    private String urlWeather;
 
     @Bean("telgramNotify")
     public WebClient telgramNotify() {
         String token = "bot" + botToken;
-        String rest = url + "/" + token + "/sendMessage";
+        String rest = urlTelegram + "/" + token + "/sendMessage";
+        return WebClient.builder().baseUrl(rest)
+                                .clientConnector(getClientConnector(10000, 10000, 10000))
+                                .build();
+    }
+
+    @Bean("weatherStack")
+    public WebClient weatherStack() {
+        String rest = urlWeather;
         return WebClient.builder().baseUrl(rest)
                                 .clientConnector(getClientConnector(10000, 10000, 10000))
                                 .build();
