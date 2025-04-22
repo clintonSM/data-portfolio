@@ -3,6 +3,7 @@ package com.ctsml.notificaciones.proxy.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ctsml.notificaciones.proxy.RetrieveClima;
@@ -10,13 +11,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import reactor.core.publisher.Mono;
 
+@Service
 public class RetirieveClimaImpl implements RetrieveClima {
 
     @Autowired
     @Qualifier("weatherStack")
     private WebClient webClient;
 
-    @Value("${weather.clima.query}")
+    @Value("${weather.clima.token}")
     private String tokenWeather;
 
     @Override
