@@ -26,11 +26,13 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Mono<Void> envios(Update update) {
+        log.info("INICIO ENVIOS");
         if (update.getMessage().hasLocation()) {
+            log.info("ENVIO UBICACION");
             InlineKeyboardMarkup markup = Utility.finalizarDiag();
             return retrieveClima.getClima("Lima").flatMap(resp -> {
                 SendMessage message = new SendMessage();
-                message.setChatId(update.getCallbackQuery().getMessage().getChatId().toString());
+                message.setChatId(update.getMessage().getChat().getId().toString());
                 message.setText(resp);
                 message.setReplyMarkup(markup);
                 return sendTelegrama.sendMessage(message);

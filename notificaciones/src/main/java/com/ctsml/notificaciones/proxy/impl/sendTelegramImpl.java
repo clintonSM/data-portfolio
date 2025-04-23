@@ -9,9 +9,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import com.ctsml.notificaciones.proxy.SendTelegrama;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
 public class sendTelegramImpl implements SendTelegrama {
 
     @Autowired
@@ -20,6 +22,7 @@ public class sendTelegramImpl implements SendTelegrama {
 
     @Override
     public Mono<Void> sendMessage(SendMessage message) {
+        log.info(message.toString());
         return webClient.post().header("Content-Type", "application/json")
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(message)

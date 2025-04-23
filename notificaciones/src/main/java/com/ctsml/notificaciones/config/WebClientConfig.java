@@ -1,6 +1,5 @@
 package com.ctsml.notificaciones.config;
 
-
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +12,11 @@ import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
 import io.netty.resolver.DefaultAddressResolverGroup;
+import lombok.extern.slf4j.Slf4j;
 import reactor.netty.http.client.HttpClient;
 
 @Configuration
+@Slf4j
 public class WebClientConfig {
     @Value("${telegram.bot.token}")
     private String botToken;
@@ -31,24 +32,27 @@ public class WebClientConfig {
         String token = "bot" + botToken;
         String rest = urlTelegram + "/" + token + "/sendMessage";
         return WebClient.builder().baseUrl(rest)
-                                .clientConnector(getClientConnector(10000, 10000, 10000))
-                                .build();
+                .clientConnector(getClientConnector(10000, 10000, 10000))
+                .build();
     }
 
     @Bean("weatherStack")
     public WebClient weatherStack() {
         String rest = urlWeather;
+        log.info(rest);
         return WebClient.builder().baseUrl(rest)
-                                .clientConnector(getClientConnector(10000, 10000, 10000))
-                                .build();
+                .clientConnector(getClientConnector(10000, 10000, 10000))
+                .build();
     }
 
-    public static ReactorClientHttpConnector getClientConnector(int connectionTimeout, int readTimeout, int writeTimeout){
-        HttpClient httpClient = HttpClient.create().resolver(DefaultAddressResolverGroup.INSTANCE).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeout)
-                                    .doOnConnected(conn-> conn.addHandlerLast(new ReadTimeoutHandler(readTimeout,TimeUnit.MILLISECONDS))
-                                        .addHandlerLast(new WriteTimeoutHandler(writeTimeout,TimeUnit.MILLISECONDS)));
+    public static ReactorClientHttpConnector getClientConnector(int connectionTimeout, int readTimeout,
+            int writeTimeout) {
+        HttpClient httpClient = HttpClient.create().resolver(DefaultAddressResolverGroup.INSTANCE)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeout)
+                .doOnConnected(conn -> conn.addHandlerLast(new ReadTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS))
+                        .addHandlerLast(new WriteTimeoutHandler(writeTimeout, TimeUnit.MILLISECONDS)));
 
         return new ReactorClientHttpConnector(httpClient);
-                                        
+
     }
 }

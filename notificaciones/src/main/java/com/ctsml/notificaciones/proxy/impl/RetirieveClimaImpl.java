@@ -9,9 +9,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.ctsml.notificaciones.proxy.RetrieveClima;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
 public class RetirieveClimaImpl implements RetrieveClima {
 
     @Autowired
@@ -23,15 +25,11 @@ public class RetirieveClimaImpl implements RetrieveClima {
 
     @Override
     public Mono<String> getClima(String city) {
-
-        String queryStr = "?access_key=" + tokenWeather + "&query=" + city;
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/weather")
-                        .query(queryStr)
-                        .build())
+        String queryStr = "access_key=" + tokenWeather + "&query=" + city;
+        return webClient.get().uri(uriBuilder->uriBuilder.query(queryStr).build())
                 .retrieve()
                 .bodyToMono(JsonNode.class).map(resp -> {
+                    log.info(resp.toString());
                     return getData(resp);
                 });
 
